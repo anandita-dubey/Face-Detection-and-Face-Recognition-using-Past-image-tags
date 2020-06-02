@@ -1,0 +1,72 @@
+{%extends 'index.html'%}
+
+{%block content%}
+<div id="imageupload">
+    <div id="uploadForm">
+        <!-- <form action="{{url_for('preview')}}" method="post" name="Form" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="exampleInputEmail1">Upload an Image</label>
+                <div class="input-group">
+                    <div class="custom-file">
+                        <input type="file" name="file" class="custom-file-input" id="inputGroupFile04"
+                            aria-describedby="inputGroupFileAddon04" required>
+                        <label class="custom-file-label" for="inputGroupFile04">Choose file</label>
+                    </div>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="submit" id="inputGroupFileAddon04">Next</button>
+                        <button id="loader" class="btn btn-primary" type="button" disabled style="display: none;">
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span class="sr-only"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form> -->
+        <div class="card indigo text-center z-depth-2 light-version py-4 px-5">
+            <form class="md-form" action="{{url_for('preview')}}" method="post" name="Form" enctype="multipart/form-data">
+              <div class="file-field">
+                <div class="btn btn-outline-white waves-effect btn-sm">
+                  <span>Choose file<i class="fas fa-cloud-upload-alt ml-3" aria-hidden="true"></i></span>
+                  <input type="file" name="file" id="inputGroupFile04" required>
+                </div>
+                <button class="btn btn-elegant btn-sm" type="submit" id="inputGroupFileAddon04">Next</button>
+                <button id="loader" class="btn btn-dark btn-sm" type="button" disabled style="display: none;">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span class="sr-only"></span>
+                </button>
+              </div>
+            </form>
+        </div>
+        <br>
+        <div class="card" style="padding: 1%;justify-content: space-evenly;">
+            <p>Automation helps in building systems that are easy to
+                use and profitable. With the use of Automation, we can achieve
+                Improved Customer Experience, Continuous Improvement,
+                and Improved Performance. The application aims to use
+                Automatic Face Detection and Recognition system on the image
+                uploaded by the user on social media and provide tags to the
+                user for the faces detected in the image. The Tags are predicted
+                by a Progressive Machine Learning Model, which learns every
+                time it discovers a new image with new facial features and
+                predicts tags for faces in the new image which have similar
+                features. Traditional way of tagging faces in an image is Manual.
+                Automating this with the help of Machine Learning will
+                Improve Customer Experience, with the help of Progressive
+                Machine Learning Model will ensure Continuous Improvement.
+            </p>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).on('change', '.custom-file-input', function (event) {
+        $(this).next('.custom-file-label').html(event.target.files[0].name);
+    })
+    $(document).on('click','#inputGroupFileAddon04',function(event){
+        if(document.forms["Form"]["file"].value!=""){
+            $(this).hide();
+            $('#loader').show();
+        }
+    })
+</script>
+
+{%endblock%}

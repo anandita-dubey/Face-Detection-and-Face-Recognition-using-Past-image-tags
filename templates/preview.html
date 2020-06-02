@@ -1,0 +1,135 @@
+{%extends 'index.html'%}
+
+{%block content%}
+<div id="imageupload">
+    <div id="uploadForm1">
+        <div id="uploadShow">
+            <span id="photo"><img id="output" src="{{src}}" class="card" /></span>
+        </div>
+        <div id="buttons" class="card">
+            <button type="button" class="btn btn-elegant btn-sm" id="tag" onclick="tagImage()">Tag Image</button>
+            <button type="button" class="btn btn-elegant btn-sm" onclick="appendArray()">Finish</button>
+            <button type="button" class="btn btn-indigo btn-sm"><a href="{{url_for('parent')}}"
+                    style="text-decoration: none; color: white;">Upload
+                    New</a></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    var dataJSON;
+    var pixels = [];
+    var rectTag="";
+    var newwidth=""
+    var newheight=""
+    $(document).ready(function(){
+        // alert($('#output').width())
+        if($('#output').height()>800 && $('#output').width()>900 ){
+            alert('Image Too Large!! Upload new Image')
+            // $('#output').css('width','60%')
+        }
+    })
+    var tagImage = function () {
+        // onclick function, redetects the faces in the image and removes the previous detection elements.
+        $('#tag').on("click", function (event) {
+            event.preventDefault();
+            $(".rect").remove();
+        });
+        pixels=[];
+        console.log("Uploaded Image Resized Width:", document.getElementById('uploadShow').offsetWidth, "Uploaded Image Resized Height", document.getElementById('uploadShow').offsetHeight);
+
+        var img = document.getElementById('output');
+        // var tracker = new tracking.ObjectTracker('face');
+
+        // tracking.track(img, tracker);
+        // tracker.on('track', function (event) {
+        //     event.data.forEach(function (rect, i) {
+        //         console.log(rect.x, rect.y, rect.width, rect.height, i);
+        //         // plotRectangle(rect.x, rect.y, rect.width, rect.height, i);
+        //     });
+        // });
+        var predicted_result={{predicted|tojson}};
+        predicted_result=JSON.parse(predicted_result);
+        console.log(predicted_result)
+        for (let index = 0; index < predicted_result.length; index++) {
+            console.log(predicted_result[index].left,predicted_result[index].top,predicted_result[index].width,predicted_result[index].height,predicted_result[index].name,index)
+            plotRectangle(predicted_result[index].left,predicted_result[index].top,predicted_result[index].width,predicted_result[index].height,predicted_result[index].name,index)
+        }
+
+        function plotRectangle(x, y, w, h, facename,i) {
+            var rect = document.createElement('div');
+            var arrow = document.createElement('div');
+            var input = document.createElement('input');
+            rect.setAttribute("id", i);
+            input.setAttribute("id", i);
+            input.classList.add("class", "tagInput");
+            input.classList.add("class", "rectInput");
+            input.value=facename
+            input.addEventListener('change', function () {
+                // console.log("IN");
+                // getting the detected face rectangle element coordinates
+                var rectID = this.getAttribute("id")
+                var rectTag = this.value;
+                var imageWidth = document.getElementById('output').offsetWidth;
+                var imageHeight = document.getElementById('output').offsetHeight;
+                // console.log(rectTag);
+                var p = document.getElementById("output");
+                var style = p.currentStyle || window.getComputedStyle(p);
+                var marginleft=parseInt(style.marginLeft);
+                var marginright=parseInt(style.marginRight);
+                var margintop = parseInt(style.marginTop);
+	            var marginbottom = parseInt(style.marginBottom);
+                console.log(marginleft,marginright,margintop,marginbottom);
+                var el = document.querySelectorAll('.rect');
+                for (let index = 0; index < el.length; index++) {
+                    if (el[index].id == rectID && rectTag!="") {
+                        var position = el[index].getBoundingClientRect();
+                        // console.log(position);
+                        pixels.push({
+                            [rectTag]: {
+                                "ImageWidth": imageWidth,
+                                "ImageHeight": imageHeight,
+                                "left": x,
+                                "top": y,
+                                "right": x+w,
+                                "bottom": h+y
+                            }
+                        });
+                        dataJSON = JSON.stringify(pixels);
+                        // console.log(dataJSON);
+                    }
+                }
+            });
+            
+        rect.onclick = function name() {
+            input.select();
+        };
+
+        arrow.classList.add('arrow');
+        rect.classList.add('rect');
+
+        rect.appendChild(input);
+        rect.appendChild(arrow);
+        document.getElementById('photo').appendChild(rect);
+
+        rect.style.width = w + 'px';
+        rect.style.height = h + 'px';
+        rect.style.left = (img.offsetLeft + x) + 'px';
+        rect.style.top = (img.offsetTop + y) + 'px';
+            };
+        };
+
+    
+    var appendArray = function () {
+        console.log(dataJSON);
+        if (dataJSON.length!=0) {
+            $.ajax({
+            type: 'POST',
+            url: '{{url_for("getdataJSON")}}',
+            data: { 'jsonData': dataJSON }
+        });
+        }
+    };
+</script>
+
+{%endblock%}
